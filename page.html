@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Image Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root {
+    --primary-color: #ff1f8f;
+    --secondary-color: #00f7ff;
+    --bg-color: #1a1a1a;
+    --panel-bg: #242424;
+    --text-color: #ffffff;
+    --border-radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* Panels */
+.settings-panel, .queue-panel {
+    background-color: var(--panel-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Settings Groups */
+.setting-group {
+    margin-bottom: 20px;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #888;
+}
+
+/* Inputs */
+.text-input, .dropdown select {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+}
+
+/* Slider */
+.slider {
+    width: 100%;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    -webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-container {
+    max-width: 100%;
+    max-height: 70vh;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 20px rgba(0, 247, 255, 0.1);
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Queue Panel */
+.queue-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.badge {
+    background-color: var(--primary-color);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+}
+
+.queue-item {
+    margin-bottom: 10px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.queue-item img {
+    width: 100%;
+    height: auto;
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.remove-ads {
+    width: 100%;
+    padding: 8px;
+    background-color: #333;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clear-queue {
+    margin-top: auto;
+    padding: 8px;
+    background-color: #333;
+    color: var(--text-color);
+}
+
+/* Toolbar */
+.toolbar {
+    background-color: var(--panel-bg);
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: auto;
+}
+#removeBgButton{
+    background-color: #6366f1;
+}
+
+.tool-btn {
+    width: 40px;
+    height: 40px;
+    background-color: #333;
+    color: var(--text-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tool-btn:hover {
+    background-color: #444;
+    transform: translateY(-2px);
+}
+
+.tool-btn.primary {
+    background-color: var(--primary-color);
+}
+
+/* Hover Effects */
+button:hover {
+    background-color: #444;
+}
+
+.remove-ads:hover, .clear-queue:hover {
+    background-color: #444;
+}
+
+/* Glass Card Component */
+.glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 5rem;
+    transition: var(--transition);
+   
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+}
+
+/* Upload Section */
+.upload-area {
+    min-height: 400px;
+    border: 2px dashed var(--glass-border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    position: relative;
+    padding: 6rem;
+    overflow: hidden;
+    margin-top: -30px;
+    
+}
+
+.upload-area:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 2rem;
+}
+
+.upload-icon {
+    width: 64px;
+    height: 64px;
+    fill: var(--primary);
+    margin-bottom: 1rem;
+    transition: var(--transition);
+}
+
+.upload-label:hover .upload-icon {
+    transform: scale(1.1);
+}
+
+.upload-text {
+    text-align: center;
+}
+
+.browse-text {
+    color: var(--primary);
+    font-weight: 500;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* Quick Actions */
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.upload{
+    background-color: #6366f1;
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+}
+.btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.btn-secondary {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+.uploadbtn{
+    background-color: #6366f1;
+    color: #fff;
+    padding: 12px;
+   position: absolute;
+   top: 75%;
+   left:83%;
+}
+#uploadedbox{
+    padding: 15px;
+    height: 200px;
+    border:1px solid #6366f1;
+    border-radius: 10px;
+}
+
+.color-picker {
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel -->
+        <div class="settings-panel">
+
+           
+            <div class="setting-group">
+                <label>Image Name</label>
+                <input type="text" value="cyberpunk-scene" class="text-input">
+            </div>
+
+            <div class="setting-group">
+                <label>Background</label>
+                <div class="dropdown">
+                    <select>
+                        <option>None</option>
+                        <option>Remove Background</option>
+                        <option>Custom Background</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Model</label>
+                <div class="dropdown">
+                    <select>
+                        <option>ISNet</option>
+                        <option>U2Net</option>
+                        <option>Custom</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Quality</label>
+                <input type="range" min="0" max="100" value="80" class="slider">
+            </div>
+
+            <div class="setting-group">
+                <label>Format</label>
+                <div class="dropdown">
+                    <select>
+                        <option>PNG</option>
+                        <option>JPG</option>
+                        <option>WEBP</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <button class="remove-ads">
+                    <i class="fas fa-times"></i> Ads
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="image-container">
+                <div class="upload-section glass-card" style=" height:480px;">
+                    <div class="upload-area" id="dropZone"
+                    ondragover="handleDragOver(event)"
+                    ondragleave="handleDragLeave(event)"
+                    ondrop="handleDrop(event)">
+                        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" hidden>
+                        <label for="fileInput" class="upload-label">
+                            <svg class="upload-icon" viewBox="0 0 24 24">
+                                <path d="M14,13V17H10V13H7L12,8L17,13H14M19.35,10.03C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.03C2.34,8.36 0,10.9 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.03Z"/>
+                            </svg>
+                            <div class="upload-text">
+                                <span>Drag & Drop your image here</span>
+                                <span class="browse-text">or click to browse</span>
+                            </div>
+                        </label>
+                        <div class="upload-preview">
+                            <img id="uploadedImage" class="preview-image" alt="Upload preview" hidden/>
+                        </div>
+                    </div>
+                </div>
+
+                <!--- create upload option here User can upload here -->
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="queue-panel">
+            <div class="queue-item">
+                <div class="background-option" id="uploadedbox">
+                    <label for="backgroundImageInput">Upload an Image:</label>
+                    <input type="file" id="backgroundImageInput" accept="image/*" hidden>
+           
+            </div>
+           <br>
+           <br>
+            <div class="background-options">
+                <h3>Choose Background</h3>
+                <br>
+                <div class="background-option">
+                  <label for="colorPicker">Choose a Color:</label>
+                  <br>
+                  <br>
+               
+                  <input type="color" id="colorPicker" class="color-picker btn-secondary" title="Choose background color">
+                  <br>
+               
+                </div>
+ </div>              
+                <button class="btn-secondary uploadbtn" onclick="document.getElementById('backgroundImageInput').click()">
+                  Upload Background Image
+                </button>
+              </div>
+        </div>
+    </div>
+
+    <!-- Bottom Toolbar -->
+    <div class="toolbar">
+        <button class="btn btn-primary pulse-effect" id="removeBgButton" onclick="submitHandler()">
+            <svg viewBox="0 0 24 24">
+                <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19M13,17H15V7H13V17M9,17H11V13H9V17M9,11H11V7H9V11Z"/>
+            </svg>
+            Remove Background
+        </button>
+        <button class="btn btn-secondary">
+            <svg viewBox="0 0 24 24">
+                <path d="M19,9H15V3H9V9H5L12,16L19,9M5,18V20H19V18H5Z"/>
+            </svg>
+            Download
+        </button>
+      
+    <button id="reloadBtn" class="btn-secondary reset"  onclick="confirmReset()">
+     <svg viewBox="0 0 24 24">
+       <path d="M12 5V2L8 6l4 4V7c3.31 0 6 2.69 6 6 0 2.97-2.17 5.43-5 5.91v2.02c3.95-.49 7-3.85 7-7.93 0-4.42-3.58-8-8-8zm-6 8c0-1.65.67-3.15 1.76-4.24L6.34 7.34C4.9 8.79 4 10.79 4 13c0 4.08 3.05 7.44 7 7.93v-2.02c-2.83-.48-5-2.94-5-5.91z"/>
+     </svg>
+     Reset
+   </button>
+
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
